@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 #include "../lib_easy_example/easy_example.h"
+#include "stack_on_mass.h"
 
 float division(int a, int b) {
     if (b == 0) {
@@ -9,3 +10,4 @@ float division(int a, int b) {
     }
     return static_cast<float>(a) / b;
 }
+
