@@ -1,11 +1,13 @@
+#pragma once
 #include <stdexcept>
+#include <cstddef>
 
 template <typename T>
 class TStack {
 private:
 	T* _data;
 	size_t _size;
-	size_t _top;
+	int _top;
 public:
 	TStack(size_t);
 	TStack(const TStack&);
@@ -22,14 +24,14 @@ public:
 
 template <typename T>
 TStack<T>::TStack(size_t size) {
-	T* _data = new T[size];
+	_data = new T[size];
 	_size = size;
 	_top = -1;
 }
 
 template <typename T>
 TStack<T>::TStack(const TStack& other) {
-	T* _data = new T[other._size];
+	_data = new T[other._size];
 	for (size_t i = 0; i < other._size; i++) {
 		_data[i] = other._data[i];
 	}
@@ -46,30 +48,29 @@ TStack<T>::~TStack() {
 
 template <typename T>
 inline bool TStack<T>::is_empty() const noexcept {
-	return (_size == 0);
+	return (_top == -1);
 }
 
 template <typename T>
 inline bool TStack<T>::is_full() const noexcept {
-	return ((_top - 1) == _size);
+	return (_top == (_size - 1));
 }
 
 template <typename T>
 inline size_t TStack<T>::size() {
-	return _size;
+	return _top + 1;
 }
 
 template <typename T>
 inline T& TStack<T>::top() {
-	return _top;
+	return _data[_top];
 }
 
 template <typename T>
 T TStack<T>::pop() {
 	if (is_empty())
 		throw "empty";
-	_top--;
-	return _data[_top + 1];
+	return _data[_top--];
 }
 
 template <typename T>
