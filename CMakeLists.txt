@@ -15,6 +15,8 @@ include(cmake/function.cmake)         # подхватываем функции,
 
 add_subdirectory(lib_algorithms)    # подключаем дополнительный CMakeLists.txt из подкаталога с именем lib_algorithms
 
+add_subdirectory(lib_multi_stack)
+
 add_subdirectory(lib_queue)
 
 add_subdirectory(lib_stack_on_mass)
