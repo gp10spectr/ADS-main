@@ -79,18 +79,23 @@ void Queue<T>::push(const T& value) {
 	}
 	data[back] = value;
 	back = (back + 1) % size;
+	count++;
 }
 
 template <typename T>
 T Queue<T>::pop() {
+	if (is_empty()) {
+		throw std::out_of_range("empty");
+	}
 	T tmp = data[front];
 	front = (front + 1) % size;
+	count--;
 	return tmp;
 }
 
 template <typename T>
 T& Queue<T>::get_front() {
-	if (size == 0) {
+	if (is_empty()) {
 		throw std::out_of_range("empty");
 	}
 	return data[front];
