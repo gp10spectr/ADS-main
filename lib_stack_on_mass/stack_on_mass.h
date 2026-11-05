@@ -69,14 +69,14 @@ inline T& TStack<T>::top() {
 template <typename T>
 T TStack<T>::pop() {
 	if (is_empty())
-		throw "empty";
+		throw std::out_of_range("empty");
 	return _data[_top--];
 }
 
 template <typename T>
 void TStack<T>::push(const T& value) {
 	if (is_full())
-		throw "full";
+		throw std::out_of_range("full");
 	_data[++_top] = value;
 }
 
