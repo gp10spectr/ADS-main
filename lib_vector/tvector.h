@@ -1,7 +1,12 @@
-#pragma once
+// Copyright 2026 Khaferl Pavel
+
+#ifndef LIB_VECTOR_TVECTOR_H_
+#define LIB_VECTOR_TVECTOR_H_
+
 #include <iostream>
 #include <type_traits>
-#include "tmemdata.h"
+#include <utility>
+#include "lib_vector/tmemdata.h"
 
 template <typename T>
 class TVector;
@@ -13,6 +18,7 @@ std::istream& operator>>(std::istream&, TVector<T>&);
 
 template <typename T>
 class TVector {
+private:
     MemData<T> _mem;
     size_t _front;
     size_t _back;
@@ -22,9 +28,9 @@ class TVector {
 public:
     template <typename Type>
     class Iterator {
-        // if Type = T          -> VecPtr = TVector<T>*
-        // if Type = const T    -> VecPtr = const TVector<T>*
-        using VecPtr = std::conditional_t<std::is_const_v<Type>, const TVector<T>*, TVector<T>*>;
+        using VecPtr = std::conditional_t<std::is_const_v<Type>,
+            const TVector<T>*,
+            TVector<T>*>;
 
         VecPtr _vec;
         size_t _pos;
@@ -46,8 +52,8 @@ public:
         Iterator& operator--() { --_pos; return *this; }
         Iterator  operator--(int) { Iterator tmp(*this); --_pos; return tmp; }
 
-        Iterator  operator+ (int i) const { return Iterator(_vec, _pos + i); }
-        Iterator  operator- (int i) const { return Iterator(_vec, _pos - i); }
+        Iterator  operator+(int i) const { return Iterator(_vec, _pos + i); }
+        Iterator  operator-(int i) const { return Iterator(_vec, _pos - i); }
         Iterator& operator+=(int i) { _pos += i; return *this; }
         Iterator& operator-=(int i) { _pos -= i; return *this; }
 
@@ -71,7 +77,7 @@ public:
     using iterator = Iterator<T>;
     using const_iterator = Iterator<const T>;
 
-    TVector(size_t size = 0);
+    explicit TVector(size_t size = 0);
     TVector(std::initializer_list<T>);
     TVector(T*, size_t);
     TVector(const TVector&);
@@ -115,8 +121,10 @@ public:
     T& operator[](size_t) noexcept;
     const T& operator[](size_t) const noexcept;
 
-    template <typename U> friend std::ostream& operator<<(std::ostream&, const TVector<U>&);
-    template <typename U> friend std::istream& operator>>(std::istream&, TVector<U>&);
+    template <typename U>
+    friend std::ostream& operator<<(std::ostream&, const TVector<U>&);
+    template <typename U>
+    friend std::istream& operator>>(std::istream&, TVector<U>&);
 };
 
 template <typename T>
@@ -153,15 +161,18 @@ void TVector<T>::shrink_to_fit() {
 
 template <typename T>
 TVector<T>::TVector(size_t size)
-    : _mem(size), _front(0), _back(size ? size - 1 : 0) {}
+    : _mem(size), _front(0),
+    _back(size ? size - 1 : static_cast<size_t>(0)) {}
 
 template <typename T>
 TVector<T>::TVector(std::initializer_list<T> list)
-    : _mem(list), _front(0), _back(list.size() ? list.size() - 1 : 0) {}
+    : _mem(list), _front(0),
+    _back(list.size() ? list.size() - 1 : static_cast<size_t>(0)) {}
 
 template <typename T>
 TVector<T>::TVector(T* arr, size_t size)
-    : _mem(arr, size), _front(0), _back(size ? size - 1 : 0) {}
+    : _mem(arr, size), _front(0),
+    _back(size ? size - 1 : static_cast<size_t>(0)) {}
 
 template <typename T>
 TVector<T>::TVector(const TVector& other)
@@ -575,3 +586,5 @@ std::istream& operator>>(std::istream& is, TVector<T>& vec) {
     }
     return is;
 }
+
+#endif  // LIB_VECTOR_TVECTOR_H_

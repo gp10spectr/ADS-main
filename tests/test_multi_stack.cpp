@@ -1,5 +1,8 @@
+// Copyright 2026 Khaferl Pavel
+
 #include <gtest/gtest.h>
-#include "multi_stack.h"
+#include <utility>
+#include "lib_multi_stack/multi_stack.h"
 
 TEST(MultiStackTest, Initialization) {
     Multi_Stack<int> ms(3, 9);
@@ -15,7 +18,7 @@ TEST(MultiStackTest, Initialization) {
 }
 
 TEST(MultiStackTest, PushAndPopIndependent) {
-    Multi_Stack<int> ms(3, 9); //3 slots for every stack
+    Multi_Stack<int> ms(3, 9);  // 3 slots for every stack
     ms.push(0, 10);
     ms.push(0, 20);
     ms.push(1, 100);
@@ -32,24 +35,24 @@ TEST(MultiStackTest, PushAndPopIndependent) {
 }
 
 TEST(MultiStackTest, RepackWhenOneStackOverflows) {
-    //2 stacks mutual size 4 and 2 slots for every stack
+    // 2 stacks mutual size 4 and 2 slots for every stack
     Multi_Stack<int> ms(2, 4);
 
     ms.push(0, 1);
     ms.push(0, 2);
-    //stack 0 localy full but mutual stack is not
+    // stack 0 localy full but mutual stack is not
     EXPECT_TRUE(ms.is_full(0));
     EXPECT_FALSE(ms.is_full());
 
-    //next push will use repack and will take slots from first stack
+    // next push will use repack and will take slots from first stack
     EXPECT_NO_THROW(ms.push(0, 3));
     EXPECT_EQ(ms.get_top(0), 3);
     EXPECT_EQ(ms.get_count(), 3);
 
     ms.push(1, 99);
-    EXPECT_TRUE(ms.is_full()); //now all 4 slots are taken
+    EXPECT_TRUE(ms.is_full());  // now all 4 slots are taken
 
-    //push in full stack
+    // push in full stack
     EXPECT_THROW(ms.push(0, 4), std::out_of_range);
 }
 
@@ -70,7 +73,7 @@ TEST(MultiStackTest, CopyAndMove) {
 
     Multi_Stack<int> copy = ms;
     EXPECT_EQ(copy.pop(0), 1);
-    EXPECT_FALSE(ms.is_empty(0)); //original doesnt change
+    EXPECT_FALSE(ms.is_empty(0));  // original doesnt change
 
     Multi_Stack<int> moved = std::move(ms);
     EXPECT_EQ(moved.pop(1), 2);

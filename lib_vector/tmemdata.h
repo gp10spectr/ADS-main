@@ -1,4 +1,8 @@
-#pragma once
+// Copyright 2026 Khaferl Pavel
+
+#ifndef LIB_VECTOR_TMEMDATA_H_
+#define LIB_VECTOR_TMEMDATA_H_
+
 #include <initializer_list>
 #include <cstddef>
 
@@ -11,6 +15,7 @@ class TVector;
 
 template <typename T>
 class MemData {
+private:
     T* _data;
     size_t _size;
     size_t _capacity;
@@ -20,7 +25,7 @@ class MemData {
     }
 
 public:
-    MemData(size_t size = 0);
+    explicit MemData(size_t size = 0);
     MemData(std::initializer_list<T>);
     MemData(T*, size_t);
     MemData(const MemData&);
@@ -54,8 +59,7 @@ MemData<T>::MemData(size_t size) : _data(nullptr), _size(size), _capacity(0) {
 
 template <typename T>
 MemData<T>::MemData(std::initializer_list<T> list)
-    : _data(nullptr), _size(list.size()), _capacity(0)
-{
+    : _data(nullptr), _size(list.size()), _capacity(0) {
     if (_size > 0) {
         _capacity = calculate_capacity(static_cast<int>(_size));
         _data = new T[_capacity]();
@@ -66,8 +70,7 @@ MemData<T>::MemData(std::initializer_list<T> list)
 
 template <typename T>
 MemData<T>::MemData(T* arr, size_t size)
-    : _data(nullptr), _size(size), _capacity(0)
-{
+    : _data(nullptr), _size(size), _capacity(0) {
     if (size > 0) {
         _capacity = calculate_capacity(static_cast<int>(size));
         _data = new T[_capacity]();
@@ -77,8 +80,7 @@ MemData<T>::MemData(T* arr, size_t size)
 
 template <typename T>
 MemData<T>::MemData(const MemData& other)
-    : _data(nullptr), _size(other._size), _capacity(other._capacity)
-{
+    : _data(nullptr), _size(other._size), _capacity(other._capacity) {
     if (_capacity > 0) {
         _data = new T[_capacity]();
         copy_items(other._data, _data, _capacity);
@@ -87,8 +89,7 @@ MemData<T>::MemData(const MemData& other)
 
 template <typename T>
 MemData<T>::MemData(MemData&& other)
-    : _data(other._data), _size(other._size), _capacity(other._capacity)
-{
+    : _data(other._data), _size(other._size), _capacity(other._capacity) {
     other._data = nullptr;
     other._size = 0;
     other._capacity = 0;
@@ -174,3 +175,5 @@ MemData<T>& MemData<T>::operator=(MemData&& other) noexcept {
     }
     return *this;
 }
+
+#endif  // LIB_VECTOR_TMEMDATA_H_

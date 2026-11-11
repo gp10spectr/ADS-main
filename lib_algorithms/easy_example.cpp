@@ -1,8 +1,8 @@
-// Copyright 2024 Marina Usova
+// Copyright 2026 Khaferl Pavel
 
+#include "lib_algorithms/easy_example.h"
 #include <stdexcept>
-#include "easy_example.h"
-#include "stack_on_mass.h"
+#include "lib_stack_on_mass/stack_on_mass.h"
 
 float division(int a, int b) {
     if (b == 0) {
@@ -10,4 +10,3 @@ float division(int a, int b) {
     }
     return static_cast<float>(a) / b;
 }
-

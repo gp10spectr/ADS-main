@@ -1,8 +1,8 @@
-// Copyright 2024 Marina Usova
+// Copyright 2026 Khaferl Pavel
 
-#ifndef LIB_EASY_EXAMPLE_EASY_EXAMPLE_H_
-#define LIB_EASY_EXAMPLE_EASY_EXAMPLE_H_
+#ifndef LIB_ALGORITHMS_EASY_EXAMPLE_H_
+#define LIB_ALGORITHMS_EASY_EXAMPLE_H_
 
 float division(int a, int b);
 
-#endif  // LIB_EASY_EXAMPLE_EASY_EXAMPLE_H_
+#endif  // LIB_ALGORITHMS_EASY_EXAMPLE_H_

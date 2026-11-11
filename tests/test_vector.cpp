@@ -1,7 +1,9 @@
-
+// Copyright 2026 Khaferl Pavel
 
 #include <gtest/gtest.h>
-#include "tvector.h"
+#include <sstream>
+#include <utility>
+#include "lib_vector/tvector.h"
 
 TEST(FunctionsForMemData, calculate_capacity) {
     EXPECT_EQ(0, calculate_capacity(0));
@@ -619,12 +621,16 @@ TEST(ClassVector, combination_push_pop_insert_erase) {
         vec.push_back(12 + i);
     }
     out << vec;
-    EXPECT_EQ("{ 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 }", out.str());
+    EXPECT_EQ(
+        "{ 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 }",
+        out.str());
     out.str("");
 
     vec.insert(4, 3);
     out << vec;
-    EXPECT_EQ("{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 }", out.str());
+    EXPECT_EQ(
+        "{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 }",
+        out.str());
     out.str("");
 
     EXPECT_EQ(16, vec.size());
@@ -686,8 +692,12 @@ TEST(ClassVector, can_push_back_multiple_with_reallocation) {
     EXPECT_EQ(23u, v.size());
     EXPECT_EQ(30u, v.capacity());
     for (size_t i = 0; i < 23; ++i) {
-        if (i < 3) EXPECT_DOUBLE_EQ(double(i + 1), v[i]);
-        else EXPECT_DOUBLE_EQ(7.0, v[i]);
+        if (i < 3) {
+            EXPECT_DOUBLE_EQ(static_cast<double>(i + 1), v[i]);
+        }
+        else {
+            EXPECT_DOUBLE_EQ(7.0, v[i]);
+        }
     }
 }
 
@@ -725,13 +735,16 @@ TEST(ClassVector, can_insert_multiple) {
 
 TEST(ClassVector, can_insert_multiple_with_reallocation) {
     TVector<double> v;
-    for (int i = 0; i < 15; ++i) v.push_back(double(i + 1));
+    for (int i = 0; i < 15; ++i) v.push_back(static_cast<double>(i + 1));
     v.insert(0.0, 7, 3);
     EXPECT_EQ(18u, v.size());
     EXPECT_EQ(30u, v.capacity());
-    for (size_t i = 0; i < 7; ++i) EXPECT_DOUBLE_EQ(double(i + 1), v[i]);
-    for (size_t i = 7; i < 10; ++i) EXPECT_DOUBLE_EQ(0.0, v[i]);
-    for (size_t i = 10; i < 18; ++i) EXPECT_DOUBLE_EQ(double(i - 2), v[i]);
+    for (size_t i = 0; i < 7; ++i)
+        EXPECT_DOUBLE_EQ(static_cast<double>(i + 1), v[i]);
+    for (size_t i = 7; i < 10; ++i)
+        EXPECT_DOUBLE_EQ(0.0, v[i]);
+    for (size_t i = 10; i < 18; ++i)
+        EXPECT_DOUBLE_EQ(static_cast<double>(i - 2), v[i]);
 }
 
 TEST(ClassVector, can_pop_front_multiple) {
@@ -819,9 +832,9 @@ TEST(ClassVector, iterator_postfix_and_prefix) {
     TVector<int> v({ 1, 2, 3 });
     TVector<int>::iterator it = v.begin();
     EXPECT_EQ(1, *it);
-    EXPECT_EQ(1, *(it++));   //постфикс — возвращает старое
+    EXPECT_EQ(1, *(it++));  // постфикс — возвращает старое
     EXPECT_EQ(2, *it);
-    EXPECT_EQ(3, *(++it));   //префикс — возвращает новое
+    EXPECT_EQ(3, *(++it));  // префикс — возвращает новое
 }
 
 TEST(ClassVector, iterator_arithmetic) {
@@ -862,7 +875,7 @@ TEST(ClassVector, iterator_with_ring_buffer) {
     TVector<int> v;
     for (int i = 1; i <= 15; ++i) v.push_back(i);
     v.pop_front();
-    v.push_back(16);   // front=1, back=0 -> кольцо
+    v.push_back(16);  // front=1, back=0 -> кольцо
 
     int expected = 2;
     for (TVector<int>::iterator it = v.begin(); it != v.end(); ++it) {
@@ -901,7 +914,7 @@ TEST(ClassVector, shrink_to_fit_reduces_capacity_to_minimum) {
     for (int i = 0; i < 46; ++i) v.push_back(static_cast<double>(i));
     EXPECT_EQ(46u, v.size());
     EXPECT_EQ(60u, v.capacity());
-    //shrink to fit doesnt make data worse
+    // shrink to fit doesnt make data worse
     v.shrink_to_fit();
     EXPECT_EQ(46u, v.size());
     EXPECT_EQ(60u, v.capacity());

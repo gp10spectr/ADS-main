@@ -7,6 +7,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # название проекта
 project(DataStructure)
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
 # затем следует список инструкций для подключения проектов из подкаталогов
 
 include(cmake/function.cmake)         # подхватываем функции, реализованные в файле function.cmake
