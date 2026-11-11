@@ -1,4 +1,4 @@
-// Copyright 2026 Khaferl Pavel
+// Copyright 2024 Khaferl Pavel
 
 #ifndef LIB_ALGORITHMS_EASY_EXAMPLE_H_
 #define LIB_ALGORITHMS_EASY_EXAMPLE_H_
