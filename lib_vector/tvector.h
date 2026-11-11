@@ -118,8 +118,8 @@ class TVector {
   TVector& operator=(const TVector&) noexcept;
   TVector& operator=(TVector&&) noexcept;
 
-  T& operator[](size_t) noexcept;
-  const T& operator[](size_t) const noexcept;
+  T& operator[](size_t idx) noexcept;
+  const T& operator[](size_t idx) const noexcept;
 
   template <typename U>
   friend std::ostream& operator<<(std::ostream&, const TVector<U>&);
