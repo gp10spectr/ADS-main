@@ -71,6 +71,9 @@ inline size_t TStack<T>::count() const noexcept {
 
 template <typename T>
 inline T& TStack<T>::top() {
+  if (is_empty()) {
+    throw std::logic_error("stack is empty");
+  }
   return _data[_top];
 }
 

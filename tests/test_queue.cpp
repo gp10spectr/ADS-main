@@ -52,13 +52,13 @@ TEST(QueueTest, OverflowException) {
   Queue<int> q(2);
   q.push(100);
   q.push(200);
-  EXPECT_THROW(q.push(300), std::out_of_range);
+  EXPECT_THROW(q.push(300), std::logic_error);
 }
 
 TEST(QueueTest, EmptyQueueExceptions) {
   Queue<int> q(2);
-  EXPECT_THROW(q.get_front(), std::out_of_range);
-  EXPECT_THROW(q.pop(), std::out_of_range);
+  EXPECT_THROW(q.get_front(), std::logic_error);
+  EXPECT_THROW(q.pop(), std::logic_error);
 }
 
 TEST(QueueTest, CopyConstructor) {

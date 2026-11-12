@@ -53,10 +53,6 @@ Queue<T>::Queue(const Queue& other) {
 template <typename T>
 Queue<T>::~Queue() {
   delete[] data;
-  size = 0;
-  front = 0;
-  back = 0;
-  count = 0;
 }
 
 template <typename T>
@@ -77,7 +73,7 @@ bool Queue<T>::is_empty() const noexcept {
 template <typename T>
 void Queue<T>::push(const T& value) {
   if (is_full()) {
-    throw std::out_of_range("full");
+    throw std::logic_error("queue is full");
   }
   data[back] = value;
   back = (back + 1) % size;
@@ -87,7 +83,7 @@ void Queue<T>::push(const T& value) {
 template <typename T>
 T Queue<T>::pop() {
   if (is_empty()) {
-    throw std::out_of_range("empty");
+    throw std::logic_error("queue is empty");
   }
   T tmp = data[front];
   front = (front + 1) % size;
@@ -98,7 +94,7 @@ T Queue<T>::pop() {
 template <typename T>
 T& Queue<T>::get_front() {
   if (is_empty()) {
-    throw std::out_of_range("empty");
+    throw std::logic_error("queue is empty");
   }
   return data[front];
 }
