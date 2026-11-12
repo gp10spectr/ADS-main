@@ -21,7 +21,8 @@ class TStack {
   void push(const T&);
   T pop();
   inline T& top();
-  inline size_t size();
+  inline size_t size() const noexcept;
+  inline size_t count() const noexcept;
   inline bool is_empty() const noexcept;
   inline bool is_full() const noexcept;
 };
@@ -46,8 +47,6 @@ TStack<T>::TStack(const TStack& other) {
 template <typename T>
 TStack<T>::~TStack() {
   delete[] _data;
-  _size = 0;
-  _top = -1;
 }
 
 template <typename T>
@@ -57,12 +56,17 @@ inline bool TStack<T>::is_empty() const noexcept {
 
 template <typename T>
 inline bool TStack<T>::is_full() const noexcept {
-  return (_top == (_size - 1));
+  return (_top == _size - 1);
 }
 
 template <typename T>
-inline size_t TStack<T>::size() {
-  return _top + 1;
+inline size_t TStack<T>::size() const noexcept {
+  return _size;
+}
+
+template <typename T>
+inline size_t TStack<T>::count() const noexcept {
+    return _top + 1;
 }
 
 template <typename T>
@@ -73,7 +77,7 @@ inline T& TStack<T>::top() {
 template <typename T>
 T TStack<T>::pop() {
   if (is_empty()) {
-    throw "empty";
+    throw std::logic_error("stack is empty");
   }
   return _data[_top--];
 }
@@ -81,7 +85,7 @@ T TStack<T>::pop() {
 template <typename T>
 void TStack<T>::push(const T& value) {
   if (is_full()) {
-    throw "full";
+      throw std::logic_error("stack is full");
   }
   _data[++_top] = value;
 }
