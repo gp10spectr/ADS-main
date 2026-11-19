@@ -24,6 +24,68 @@ class List {
     ~Node() = default;
   };
 
+  template <typename Type>
+  class Iterator {
+  private:
+      Node<Type>* cur;
+
+  public:
+      typedef Iterator<Node> iterator;
+      typedef Iterator<const Node> const_iterator;
+      Iterator(Type* c = nullptr) : cur(n) {}
+      Iterator(const Iterator&) = default;
+
+      Type& operator*() const {
+          if (cur == nullptr) {
+              throw std::logic_error("its not safe to use * for nullptr");
+          }
+          return cur->data;
+      }
+
+      Type* operator->() const {
+          if (cur == nullptr) {
+              throw std::logic_error("its not safe to use * for nullptr");
+          }
+          return &(cur->data);
+      }
+
+      Iterator& operator++() {
+          if (cur != nullptr) {
+              // liquid
+              cur = cur->next;
+          }
+          return (*this);
+      }
+
+      Iterator operator++(int) {
+          if (cur != nullptr) {
+              Iterator tmp((*this));
+              cur = cur->next;
+          }
+          return tmp;
+      }
+
+      Iterator operator+(int i) const {
+          if (i < 0) {
+              throw std::logic_error("i value shall be posiive");
+          }
+          if (i > 0) {
+              if (cur == nullptr) {
+                  throw std::logic_error("nullptr");
+              }
+              while (i != 0) {
+                  cur = cur->next;
+                  i--;
+              }
+          }
+          return Iterator(cur);
+      }
+
+      Iterator& operator+=(int i) const {
+          
+      }
+  };
+
   size_t size;
   Node* head;
   Node* tail;
