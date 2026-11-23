@@ -26,64 +26,71 @@ class List {
 
   template <typename Type>
   class Iterator {
-  private:
-      Node<Type>* cur;
+   private:
+    Node* cur;
+    friend class List<T>;
+    template <typename>
+    friend class Iterator;
 
-  public:
-      typedef Iterator<Node> iterator;
-      typedef Iterator<const Node> const_iterator;
-      Iterator(Type* c = nullptr) : cur(n) {}
-      Iterator(const Iterator&) = default;
+   public:
+    explicit Iterator(Node* c = nullptr) noexcept : cur(c) {}
+    Iterator(const Iterator&) noexcept = default;
+    Iterator& operator=(const Iterator&) noexcept = default;
 
-      Type& operator*() const {
-          if (cur == nullptr) {
-              throw std::logic_error("its not safe to use * for nullptr");
-          }
-          return cur->data;
+    Type& operator*() const {
+      if (cur == nullptr) {
+        throw std::logic_error("its not safe to use * for nullptr");
       }
+      return cur->data;
+    }
 
-      Type* operator->() const {
-          if (cur == nullptr) {
-              throw std::logic_error("its not safe to use * for nullptr");
-          }
-          return &(cur->data);
+    Type* operator->() const {
+      if (cur == nullptr) {
+        throw std::logic_error("its not safe to use -> for nullptr");
       }
+      return &(cur->data);
+    }
 
-      Iterator& operator++() {
-          if (cur != nullptr) {
-              // liquid
-              cur = cur->next;
-          }
-          return (*this);
+    Iterator& operator++() noexcept {
+      if (cur != nullptr) {
+        cur = cur->next;
       }
+      return *this;
+    }
 
-      Iterator operator++(int) {
-          if (cur != nullptr) {
-              Iterator tmp((*this));
-              cur = cur->next;
-          }
-          return tmp;
-      }
+    Iterator operator++(int) noexcept {
+      Iterator tmp(*this);
+      ++(*this);
+      return tmp;
+    }
 
-      Iterator operator+(int i) const {
-          if (i < 0) {
-              throw std::logic_error("i value shall be posiive");
-          }
-          if (i > 0) {
-              if (cur == nullptr) {
-                  throw std::logic_error("nullptr");
-              }
-              while (i != 0) {
-                  cur = cur->next;
-                  i--;
-              }
-          }
-          return Iterator(cur);
+    Iterator operator+(int i) const {
+      if (i < 0) {
+        throw std::logic_error("i value shall be positive");
       }
+      Iterator tmp(*this);
+      while (i > 0) {
+        if (tmp.cur == nullptr) {
+          throw std::logic_error("nullptr");
+        }
+        tmp.cur = tmp.cur->next;
+        --i;
+      }
+      return tmp;
+    }
 
-      Iterator& operator+=(int i) const {
-          
-      }
+    Iterator& operator+=(int i) {
+      *this = *this + i;
+      return *this;
+    }
+
+    bool operator==(const Iterator& other) const noexcept {
+      return cur == other.cur;
+    }
+
+    bool operator!=(const Iterator& other) const noexcept {
+      return cur != other.cur;
+    }
   };
 
   size_t size;
@@ -91,6 +98,9 @@ class List {
   Node* tail;
 
  public:
+  using iterator = Iterator<T>;
+  using const_iterator = Iterator<const T>;
+
   List();
   List(const List& other);
   List(List&&) noexcept;
