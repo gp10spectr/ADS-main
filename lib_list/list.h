@@ -120,6 +120,13 @@ class List {
   T erase(size_t);
   bool is_empty() const noexcept;
   size_t get_size() const noexcept;
+
+  iterator begin() noexcept;
+  iterator end() noexcept;
+  const_iterator begin() const noexcept;
+  const_iterator end() const noexcept;
+  const_iterator cbegin() const noexcept;
+  const_iterator cend() const noexcept;
 };
 
 template <typename T>
@@ -298,8 +305,11 @@ typename List<T>::Node* List<T>::insert(const T& value, Node* pos) {
     return head;
   }
   Node* current = head;
-  while (current->next != pos) {
+  while (current != nullptr && current->next != pos) {
     current = current->next;
+  }
+  if (current == nullptr) {
+    throw std::invalid_argument("node not found");
   }
   Node* new_node = new Node(value, pos);
   current->next = new_node;
@@ -339,8 +349,11 @@ T List<T>::erase(Node* pos) {
     return pop_back();
   }
   Node* current = head;
-  while (current->next != pos) {
+  while (current != nullptr && current->next != pos) {
     current = current->next;
+  }
+  if (current == nullptr) {
+    throw std::invalid_argument("node not found");
   }
   T copy = pos->data;
   current->next = pos->next;
@@ -362,6 +375,36 @@ T List<T>::erase(size_t index) {
     current_on_index = current_on_index->next;
   }
   return erase(current_on_index);
+}
+
+template <typename T>
+typename List<T>::iterator List<T>::begin() noexcept {
+  return iterator(head);
+}
+
+template <typename T>
+typename List<T>::iterator List<T>::end() noexcept {
+  return iterator(nullptr);
+}
+
+template <typename T>
+typename List<T>::const_iterator List<T>::begin() const noexcept {
+  return const_iterator(head);
+}
+
+template <typename T>
+typename List<T>::const_iterator List<T>::end() const noexcept {
+  return const_iterator(nullptr);
+}
+
+template <typename T>
+typename List<T>::const_iterator List<T>::cbegin() const noexcept {
+  return const_iterator(head);
+}
+
+template <typename T>
+typename List<T>::const_iterator List<T>::cend() const noexcept {
+  return const_iterator(nullptr);
 }
 
 #endif  // LIB_LIST_LIST_H_

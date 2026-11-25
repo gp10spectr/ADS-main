@@ -1,7 +1,7 @@
 // Copyright 2026 Khaferl Pavel
 
-#ifndef LIB_LIST_DOUBLE_LIST_H_
-#define LIB_LIST_DOUBLE_LIST_H_
+#ifndef LIB_DOUBLE_LIST_DOUBLE_LIST_H_
+#define LIB_DOUBLE_LIST_DOUBLE_LIST_H_
 
 #include <cstddef>
 #include <iostream>
@@ -23,11 +23,118 @@ class Double_List {
     ~Node() = default;
   };
 
+  template <typename Type>
+  class Iterator {
+   private:
+    Node* cur;
+
+    friend class Double_List<T>;
+
+    template <typename>
+    friend class Iterator;
+
+   public:
+    explicit Iterator(Node* c = nullptr) noexcept : cur(c) {}
+    Iterator(const Iterator&) noexcept = default;
+    Iterator& operator=(const Iterator&) noexcept = default;
+
+    Type& operator*() const {
+      if (cur == nullptr) {
+        throw std::logic_error("its not safe to use * for nullptr");
+      }
+      return cur->data;
+    }
+
+    Type* operator->() const {
+      if (cur == nullptr) {
+        throw std::logic_error("its not safe to use -> for nullptr");
+      }
+      return &(cur->data);
+    }
+
+    Iterator& operator++() noexcept {
+      if (cur != nullptr) {
+        cur = cur->next;
+      }
+      return *this;
+    }
+
+    Iterator operator++(int) noexcept {
+      Iterator tmp(*this);
+      ++(*this);
+      return tmp;
+    }
+
+    Iterator& operator--() noexcept {
+      if (cur != nullptr) {
+        cur = cur->previous;
+      }
+      return *this;
+    }
+
+    Iterator operator--(int) noexcept {
+      Iterator tmp(*this);
+      --(*this);
+      return tmp;
+    }
+
+    Iterator operator+(int i) const {
+      if (i < 0) {
+        throw std::logic_error("i value shall be positive");
+      }
+      Iterator tmp(*this);
+      while (i > 0) {
+        if (tmp.cur == nullptr) {
+          throw std::logic_error("nullptr");
+        }
+        tmp.cur = tmp.cur->next;
+        --i;
+      }
+      return tmp;
+    }
+
+    Iterator operator-(int i) const {
+      if (i < 0) {
+        throw std::logic_error("i value shall be positive");
+      }
+      Iterator tmp(*this);
+      while (i > 0) {
+        if (tmp.cur == nullptr) {
+          throw std::logic_error("nullptr");
+        }
+        tmp.cur = tmp.cur->previous;
+        --i;
+      }
+      return tmp;
+    }
+
+    Iterator& operator+=(int i) {
+      *this = *this + i;
+      return *this;
+    }
+
+    Iterator& operator-=(int i) {
+      *this = *this - i;
+      return *this;
+    }
+
+    bool operator==(const Iterator& other) const noexcept {
+      return cur == other.cur;
+    }
+
+    bool operator!=(const Iterator& other) const noexcept {
+      return cur != other.cur;
+    }
+  };
+
   size_t size;
   Node* head;
   Node* tail;
 
  public:
+  using iterator = Iterator<T>;
+  using const_iterator = Iterator<const T>;
+
   Double_List();
   Double_List(const Double_List&);
   Double_List(Double_List&&) noexcept;
@@ -47,6 +154,13 @@ class Double_List {
   T erase(size_t);
   bool is_empty() const noexcept;
   size_t get_size() const noexcept;
+
+  iterator begin() noexcept;
+  iterator end() noexcept;
+  const_iterator begin() const noexcept;
+  const_iterator end() const noexcept;
+  const_iterator cbegin() const noexcept;
+  const_iterator cend() const noexcept;
 };
 
 template <typename T>
@@ -55,13 +169,15 @@ size_t Double_List<T>::get_size() const noexcept {
 }
 
 template <typename T>
-Double_List<T>::Node::Node(const T& d, Node* n, Node* p) : data(d), next(n), previous(p) {}
+Double_List<T>::Node::Node(const T& d, Node* n, Node* p)
+    : data(d), next(n), previous(p) {}
 
 template <typename T>
 Double_List<T>::Double_List() : size(0), head(nullptr), tail(nullptr) {}
 
 template <typename T>
-Double_List<T>::Double_List(const Double_List& other) : size(0), head(nullptr), tail(nullptr) {
+Double_List<T>::Double_List(const Double_List& other)
+    : size(0), head(nullptr), tail(nullptr) {
   if (other.size == 0) {
     return;
   }
@@ -69,7 +185,8 @@ Double_List<T>::Double_List(const Double_List& other) : size(0), head(nullptr), 
   Node* current_for_this = head;
   Node* current_for_other = other.head;
   while (current_for_other->next != nullptr) {
-    Node* new_node = new Node(current_for_other->next->data, nullptr, current_for_this);
+    Node* new_node = new Node(
+        current_for_other->next->data, nullptr, current_for_this);
     current_for_this->next = new_node;
     current_for_this = current_for_this->next;
     current_for_other = current_for_other->next;
@@ -79,7 +196,8 @@ Double_List<T>::Double_List(const Double_List& other) : size(0), head(nullptr), 
 }
 
 template <typename T>
-Double_List<T>::Double_List(Double_List&& other) noexcept : size(other.size), head(other.head), tail(other.tail) {
+Double_List<T>::Double_List(Double_List&& other) noexcept
+    : size(other.size), head(other.head), tail(other.tail) {
   other.size = 0;
   other.head = nullptr;
   other.tail = nullptr;
@@ -206,13 +324,17 @@ typename Double_List<T>::Node* Double_List<T>::find(const T& value) {
 }
 
 template <typename T>
-typename Double_List<T>::Node* Double_List<T>::insert(const T& value, Node* pos) {
+typename Double_List<T>::Node* Double_List<T>::insert(
+    const T& value, Node* pos) {
   if (pos == nullptr) {
     throw std::invalid_argument("nullptr");
   }
   if (pos == head) {
     push_front(value);
     return head;
+  }
+  if (is_empty() || pos->previous == nullptr) {
+    throw std::invalid_argument("invalid pos");
   }
   Node* current = pos->previous;
   Node* new_node = new Node(value, pos, current);
@@ -223,7 +345,8 @@ typename Double_List<T>::Node* Double_List<T>::insert(const T& value, Node* pos)
 }
 
 template <typename T>
-typename Double_List<T>::Node* Double_List<T>::insert(const T& value, size_t index) {
+typename Double_List<T>::Node* Double_List<T>::insert(
+    const T& value, size_t index) {
   if (index > size) {
     throw std::out_of_range("not in range");
   }
@@ -235,22 +358,19 @@ typename Double_List<T>::Node* Double_List<T>::insert(const T& value, size_t ind
     push_back(value);
     return tail;
   }
-  if ( index < size / 2) {
+  if (index < size / 2) {
     Node* current_on_index = head;
     for (size_t i = 0; i < index; i++) {
       current_on_index = current_on_index->next;
     }
     return insert(value, current_on_index);
   }
-  if ( index >= size / 2) {
-    Node* current_on_index = tail;
-    for (size_t i = size - 1; i > index; i--) {
-      current_on_index = current_on_index->previous;
-    }
-    return insert(value, current_on_index);
+  Node* current_on_index = tail;
+  for (size_t i = size - 1; i > index; i--) {
+    current_on_index = current_on_index->previous;
   }
+  return insert(value, current_on_index);
 }
-
 
 template <typename T>
 T Double_List<T>::erase(Node* pos) {
@@ -262,6 +382,9 @@ T Double_List<T>::erase(Node* pos) {
   }
   if (pos == tail) {
     return pop_back();
+  }
+  if (is_empty() || pos->previous == nullptr || pos->next == nullptr) {
+    throw std::invalid_argument("invalid pos");
   }
   T copy = pos->data;
   pos->previous->next = pos->next;
@@ -279,7 +402,7 @@ T Double_List<T>::erase(size_t index) {
   if (index == 0) {
     return erase(head);
   }
-  if (index == size - 1){
+  if (index == size - 1) {
     return erase(tail);
   }
   if (index < size / 2) {
@@ -289,13 +412,45 @@ T Double_List<T>::erase(size_t index) {
     }
     return erase(current);
   }
-  if (index >= size / 2) {
-    Node* current = tail;
-    for (size_t i = size - 1; i > index; i--) {
-      current = current->previous;
-    }
-    return erase(current);
+  Node* current = tail;
+  for (size_t i = size - 1; i > index; i--) {
+    current = current->previous;
   }
+  return erase(current);
 }
 
-#endif  // LIB_LIST_DOUBLE_LIST_H_
+template <typename T>
+typename Double_List<T>::iterator Double_List<T>::begin() noexcept {
+  return iterator(head);
+}
+
+template <typename T>
+typename Double_List<T>::iterator Double_List<T>::end() noexcept {
+  return iterator(nullptr);
+}
+
+template <typename T>
+typename Double_List<T>::const_iterator
+Double_List<T>::begin() const noexcept {
+  return const_iterator(head);
+}
+
+template <typename T>
+typename Double_List<T>::const_iterator
+Double_List<T>::end() const noexcept {
+  return const_iterator(nullptr);
+}
+
+template <typename T>
+typename Double_List<T>::const_iterator
+Double_List<T>::cbegin() const noexcept {
+  return const_iterator(head);
+}
+
+template <typename T>
+typename Double_List<T>::const_iterator
+Double_List<T>::cend() const noexcept {
+  return const_iterator(nullptr);
+}
+
+#endif  // LIB_DOUBLE_LIST_DOUBLE_LIST_H_

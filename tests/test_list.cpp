@@ -1,6 +1,7 @@
 // Copyright 2026 Khaferl Pavel
 
 #include <gtest/gtest.h>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include "lib_list/list.h"
@@ -161,4 +162,121 @@ TEST(ListTest, MoveSemantics) {
   EXPECT_EQ(another.get_size(), 2);
   EXPECT_EQ(another.pop_front(), 10);
   EXPECT_EQ(another.pop_front(), 20);
+}
+
+TEST(ListTest, IteratorEmptyAndTraversal) {
+  List<int> list;
+  List<int>::iterator default_it;
+  EXPECT_EQ(default_it, list.end());
+  EXPECT_EQ(list.begin(), list.end());
+  EXPECT_EQ(list.cbegin(), list.cend());
+
+  list.push_back(10);
+  list.push_back(20);
+  list.push_back(30);
+
+  int expected[] = {10, 20, 30};
+  size_t idx = 0;
+  for (auto it = list.begin(); it != list.end(); ++it) {
+    EXPECT_EQ(*it, expected[idx]);
+    *it += 1;
+    ++idx;
+  }
+  EXPECT_EQ(idx, 3);
+
+  auto it = list.begin();
+  auto prev = it++;
+  EXPECT_EQ(*prev, 11);
+  EXPECT_EQ(*it, 21);
+
+  int sum = 0;
+  for (int val : list) {
+    sum += val;
+  }
+  EXPECT_EQ(sum, 63);
+
+  auto end_it = list.end();
+  ++end_it;
+  EXPECT_EQ(end_it, list.end());
+}
+
+TEST(ListTest, IteratorArrowAndConstIterator) {
+  List<std::string> list;
+  list.push_back("hello");
+  list.push_back("world");
+
+  auto it = list.begin();
+  EXPECT_EQ(it->size(), 5);
+  it->append("!");
+  EXPECT_EQ(*it, "hello!");
+
+  const List<std::string>& clist = list;
+  auto cit = clist.begin();
+  ASSERT_NE(cit, clist.end());
+  EXPECT_EQ(*cit, "hello!");
+  EXPECT_EQ(cit->size(), 6);
+
+  auto cprev = cit++;
+  EXPECT_EQ(*cprev, "hello!");
+  EXPECT_EQ(*cit, "world");
+  ++cit;
+  EXPECT_EQ(cit, clist.end());
+
+  size_t total_len = 0;
+  for (const auto& s : clist) {
+    total_len += s.size();
+  }
+  EXPECT_EQ(total_len, 11);
+}
+
+TEST(ListTest, IteratorArithmeticAndCopy) {
+  List<int> list;
+  list.push_back(10);
+  list.push_back(20);
+  list.push_back(30);
+  list.push_back(40);
+
+  auto it = list.begin();
+  EXPECT_EQ(*(it + 0), 10);
+  EXPECT_EQ(*(it + 1), 20);
+  EXPECT_EQ(*(it + 3), 40);
+  EXPECT_EQ(it + 4, list.end());
+
+  List<int>::iterator copy_it(it);
+  EXPECT_TRUE(copy_it == it);
+  copy_it += 2;
+  EXPECT_EQ(*copy_it, 30);
+  EXPECT_EQ(*it, 10);
+  EXPECT_TRUE(copy_it != it);
+
+  List<int>::iterator assigned_it;
+  assigned_it = copy_it;
+  EXPECT_EQ(*assigned_it, 30);
+  assigned_it += 1;
+  EXPECT_EQ(*assigned_it, 40);
+}
+
+TEST(ListTest, IteratorExceptionsAndFind) {
+  List<int> empty_list;
+  EXPECT_THROW(*empty_list.end(), std::logic_error);
+  EXPECT_THROW(empty_list.end().operator->(), std::logic_error);
+  EXPECT_THROW(*empty_list.cend(), std::logic_error);
+  EXPECT_THROW(empty_list.cend().operator->(), std::logic_error);
+
+  List<int> list;
+  list.push_back(10);
+  list.push_back(20);
+  list.push_back(30);
+
+  auto it = list.begin();
+  EXPECT_THROW(it + (-1), std::logic_error);
+  EXPECT_THROW(it += (-1), std::logic_error);
+  EXPECT_THROW(it + 4, std::logic_error);
+  EXPECT_THROW(it += 4, std::logic_error);
+  EXPECT_THROW(list.end() + 1, std::logic_error);
+
+  List<int>::iterator found_it(list.find(20));
+  EXPECT_EQ(*found_it, 20);
+  ++found_it;
+  EXPECT_EQ(*found_it, 30);
 }
